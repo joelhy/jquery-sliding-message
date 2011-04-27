@@ -32,7 +32,7 @@
         var elem = $('#' + settings.id);
 
         // generate message div if it doesn't exist
-        if(elem.length == 0){
+        if(elem.length === 0){
             elem = $('<div></div>').attr('id', settings.id);
 
             elem.css({'z-index': '999',
@@ -51,13 +51,14 @@
 
         elem.html(message);
 
-        var size = parseInt(settings.size); 
+        var size = parseInt(settings.size, 10); 
+        var finalPos, initPos;
         if (settings.position === 'top') {
-            var finalPos = top;
-            var initPos = finalPos - size;
+            finalPos = top;
+            initPos = finalPos - size;
         } else {
-            var initPos = top + $(window).height();
-            var finalPos = initPos - size;
+            initPos = top + $(window).height();
+            finalPos = initPos - size;
         }
 
         elem.css('top', initPos + 'px');
