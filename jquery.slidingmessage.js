@@ -1,50 +1,76 @@
-(function() {
-    jQuery.showMessage = function(message, options){
+(function($) {
+    $.showMessage = function(message, options){
+        var bgColor = "";
+        var position = "fixed";
+        var top = 0;
+        if ($.support.opacity) {
+            bgColor = "rgba(0, 0, 0, 0.8)";
+        } else {
+            bgColor = "black";
+        }
+        if (/arm/.test(navigator.platform)) {  // 移动浏览器的fixed定位貌似有问题
+            position = "absolute";
+            top = $(window).scrollTop();
+        } else {
+            position = "fixed";
+            top = 0;
+        }
+
         // defaults
-        settings = jQuery.extend({
+        settings = $.extend({
              id: 'sliding_message_box',
-             position: 'bottom',
-             size: '90',
-             backgroundColor: 'rgb(143, 177, 240)',
+             //position: 'bottom',
+             position: 'top',
+             size: '45',
+             backgroundColor: bgColor,
+             //backgroundColor: 'green',
              delay: 1500,
              speed: 500,
-             fontSize: '30px'
-        }, options);        
-        
+             fontSize: '25px'
+        }, options);
+
         var elem = $('#' + settings.id);
-        var delayed;
-        
+
         // generate message div if it doesn't exist
         if(elem.length == 0){
             elem = $('<div></div>').attr('id', settings.id);
-            
+
             elem.css({'z-index': '999',
                       'background-color': settings.backgroundColor,
                       'text-align': 'center',
-                      'position': 'absolute',
-                      'position': 'fixed',
+                      'position': position,
                       'left': '0',
                       'width': '100%',
+                      'color': 'white',
                       'line-height': settings.size + 'px',
                       'font-size': settings.fontSize
                       });
-            
+
             $('body').append(elem);
         }
-        
+
         elem.html(message);
-        
-        if(settings.position == 'bottom'){
-            elem.css('bottom', '-' + settings.size + 'px');
-            elem.animate({bottom:'0'}, settings.speed);
-            delayed = '$("#' + settings.id + '").animate({bottom:"-' + settings.size + 'px"}, ' + settings.speed + ');';
-            setTimeout(delayed, settings.delay);
+
+        var size = parseInt(settings.size); 
+        if (settings.position === 'top') {
+            var finalPos = top;
+            var initPos = finalPos - size;
+        } else {
+            var initPos = top + $(window).height();
+            var finalPos = initPos - size;
         }
-        else if(settings.position == 'top'){
-            elem.css('top', '-' + settings.size + 'px');
-            elem.animate({top:'0'}, settings.speed);
-            delayed = '$("#' + settings.id + '").animate({top:"-' + settings.size + 'px"}, ' + settings.speed + ');';
-            setTimeout(delayed, settings.delay);
-        }
-    }
+
+        elem.css('top', initPos + 'px');
+        elem.animate({top:finalPos}, settings.speed);
+        setTimeout(function(){
+            elem.animate(
+                {top: initPos + 'px'}, 
+                settings.speed, 
+                "linear", 
+                function(){
+                    elem.css('top', '-' + settings.size + 'px');
+                }
+            );
+        }, settings.delay);
+    };
 })(jQuery);
